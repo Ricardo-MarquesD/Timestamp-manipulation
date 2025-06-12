@@ -2,43 +2,33 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include "timest.h"
 
-#define LINE 2000
-#define ITENS 1000
-
-void buffree(){
-    while(getchar() != '\n');
-}
-
-void inputVerify(time_t* timestamp, char* input, char** id, int index){
-    int year, mon, flag = 0;
+void inputVerify(time_t *timestamp, char *input, char **id){
+    int flag = 0;
     struct tm data;
 
     while (1){
         printf("Digite uma data (DD MM AAAA HH MM SS): ");
-        if(scanf("%d %d %d %d %d %d", &data.tm_mday, &mon, &year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
+        if(scanf("%d %d %d %d %d %d", &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
             buffree();
             printf("Entrada de data invalida.\n");
             continue;
         }
-
         buffree();
-
         printf("Digite o id do sensor desejado: ");
         if(fgets(input,sizeof(input), stdin) == NULL){
             printf("Entrada de id invalido.\n");
             continue;
         }
-
         input[strcspn(input, "\n")] = 0;
 
-        data.tm_mon = mon - 1;
-        data.tm_year = year - 1900;
+        data.tm_mon = data.tm_mon - 1;
+        data.tm_year = data.tm_year - 1900;
         data.tm_isdst = -1;
-
         *timestamp = mktime(&data);
 
-        for(int i = 0; i < index; i++){
+        for(int i = 0; i < ID_S-1; i++){
             if(strcmp(input, id[i]) == 0){
                 flag = 1;
                 break;
@@ -55,42 +45,17 @@ void inputVerify(time_t* timestamp, char* input, char** id, int index){
     }
 }
 
-int binarySearch(long timestamp[], int size, long timeSet){
-    int start = 0;
-    int end = size - 1;
-    int mid;
-    int near = 0;
-
-    while(start <= end){
-        mid = (start + end) / 2;
-
-        if (abs(timestamp[mid] - timeSet) < abs(timestamp[near] - timeSet)) {
-            near = mid;
-        }
-
-        if(timeSet == timestamp[mid]){
-            return mid;
-        }else if(timeSet > timestamp[mid]){
-            start = mid + 1;
-        }else{
-            end = mid - 1;
-        }
-    }
-
-    return near;
-}
-
 int main(int argc, char const *argv[]){
     FILE* file;
     time_t t;
     int index = 0;
     long timestampFile[ITENS];
     float valor[ITENS];
-    char* id[ITENS];
-    char* idTypes[5] = {"TEMP", "PRES", "UMID", "VIBR", "FLUX"};
+    char *id[ITENS];
+    char *idTypes[ID_S-1] = {"TEMP", "PRES", "UMID", "VIBR"};
     char input[10], text[LINE];
 
-    inputVerify(&t, input, idTypes, 5);
+    inputVerify(&t, input, idTypes);
 
     strncat(input, ".txt", sizeof(input) - strlen(input) - 1);
 
@@ -119,7 +84,7 @@ int main(int argc, char const *argv[]){
     int indexBS = binarySearch(timestampFile, index, t);
 
     if(indexBS >= 0 && indexBS < index){
-        printf("O registro mais perto do pedido encontrado e de: TIMESTAMP: %ld | ID: %s | VALOR: %.2f", timestampFile[indexBS], id[indexBS], valor[indexBS]);
+        printf("O registro mais perto do pedido encontrado e de: TIMESTAMP: %lld | ID: %s | VALOR: %.2f", timestampFile[indexBS], id[indexBS], valor[indexBS]);
     }else{
         printf("Nao foi encontrado nenhum registro");
     }
