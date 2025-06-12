@@ -89,58 +89,25 @@ int binarySearch(data_t data[], int size, long long timeSet){
     return near;
 }
 
-time_t getTime(){
-    int year, mon;
+time_t getTime(const char *charTime){
     struct tm data;
-    
-    while (1){
-        printf("Digite uma data (DD MM AAAA HH MM SS): ");
-        if(scanf("%d %d %d %d %d %d", &data.tm_mday, &mon, &year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
-            buffree();
-            printf("Entrada de data invalida.\n");
-            continue;
-        }
-        data.tm_mon = mon - 1;
-        data.tm_year = year - 1900;
-        data.tm_isdst = -1;
-        time_t timestamp = mktime(&data);
-        if(timestamp == -1){
-            printf("Valor do timestamp invalido.\n");
-        }else{
-            return timestamp;
-        }
-    } 
-}
-
-time_t generateTimestamp(struct tm data){
-    time_t start_timestamp, final_timestamp;
-    
+    if(sscanf(charTime, "%d/%d/%d %d:%d:%d", &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
+        printf("Falha de transformação.\n");
+    }
     data.tm_mon = data.tm_mon - 1;
     data.tm_year = data.tm_year - 1900;
     data.tm_isdst = -1;
-    start_timestamp = mktime(&data);
-    if(start_timestamp == -1){
-        printf("Data invalido no timestamp\n");
-        return -1;
+    time_t timestamp = mktime(&data);
+    if(timestamp == -1){
+        printf("Valor do timestamp invalido.\n");
+    }else{
+        return timestamp;
     }
-    data.tm_mday += 3;
-    data.tm_hour += 23;
-    data.tm_min += 59;
-    data.tm_sec += 59;
-    final_timestamp = mktime(&data);
-    if(final_timestamp == -1){
-        printf("Data invalido no timestamp\n");
-        return -1;
-    }
-
-    time_t result_timestamp = start_timestamp + rand() % (final_timestamp - start_timestamp + 1);
-    return result_timestamp;
 }
 
-char randomID(){
-    char *id[4] = {"TEMP", "PRESS", "UMID", "FLUX"};
-    int i = rand() % 4;
-    return *id[i];
+time_t generateTimestamp(time_t *start_timestamp, time_t *final_timestamp){ 
+    time_t result_timestamp = *start_timestamp + rand() % (*final_timestamp - *start_timestamp + 1);
+    return result_timestamp;
 }
 
 int randomInt(){
@@ -155,7 +122,7 @@ double randomDouble(){
     return (double)rand()/RAND_MAX;
 }
 
-char randomChar(){
+char *randomString(){
     char letter[26] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
     static char random[CHAR_S];
     for(int i = 0; i < CHAR_S-1; i++){
