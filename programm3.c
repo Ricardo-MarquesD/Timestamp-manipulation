@@ -70,7 +70,7 @@ time_t generateTimestamp(int day, int mon, int year, int hour, int min, int sec)
 }
 
 char *randomID(){
-    char *id[5] = {"TEMP", "PRESS", "UMID", "VIBR", "FLUX"};
+    char *id[4] = {"TEMP", "PRESS", "UMID", "FLUX"};
     int i = rand() % 5;
     return id[i];
 }

@@ -5,7 +5,7 @@
 #define LINE 2000
 #define ITENS 1000
 
-void orderTime(long* timestamp, char** id, float* valor, int size){
+void orderTime(long *timestamp, char **id, float *valor, int size){
     int flag = 1;
     while(flag) {
         flag = 0;
