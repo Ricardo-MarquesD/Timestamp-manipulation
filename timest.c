@@ -32,61 +32,51 @@ void orderData(data_t data[], int *quantity){
     }
 }
 
-void inputVerify(time_t *timestamp, char *input, char **id){
-    int flag = 0;
-    struct tm data;
-
-    while (1){
-        printf("Digite uma data (DD MM AAAA HH MM SS): ");
-        if(scanf("%d %d %d %d %d %d", &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
-            buffree();
-            printf("Entrada de data invalida.\n");
-            continue;
-        }
-        buffree();
-        printf("Digite o id do sensor desejado: ");
-        if(fgets(input,sizeof(input), stdin) == NULL){
-            printf("Entrada de id invalido.\n");
-            continue;
-        }
-        input[strcspn(input, "\n")] = 0;
-
-        data.tm_mon = data.tm_mon - 1;
-        data.tm_year = data.tm_year - 1900;
-        data.tm_isdst = -1;
-        *timestamp = mktime(&data);
-
-        for(int i = 0; i < ID_S-1; i++){
-            if(strcmp(input, id[i]) == 0){
-                flag = 1;
-                break;
-            }
-        }
-
-        if(flag == 0) {
-            printf("ID invalido.\n");
-        } else if (*timestamp == -1) {
-            printf("Timestamp invalido.\n");
-        } else {
-            return;
-        }
+int inputVerify(data_t *_generic, const char *charTime, const char *inputID){
+    if(charTime == NULL || inputID == NULL){
+        printf("Parametro NULL informado.\n");
+        return -1;
     }
+    int flag = 0;
+    struct tm data = {0};
+
+    if(sscanf(charTime, "%d/%d/%d %d:%d:%d", &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
+        printf("Falha de transformação.\n");
+        return -1;
+    }
+    data.tm_mon = data.tm_mon - 1;
+    data.tm_year = data.tm_year - 1900;
+    data.tm_isdst = -1;
+    strcpy(_generic->ID, inputID);
+    if(_generic->ID[0] == '\0'){
+        printf("ID invalido ou nao encontrado.\n");
+        return -1;
+    }
+    _generic->tmstamp = mktime(&data);
+    if (inputID == NULL) {
+        printf("Timestamp invalido.\n");
+        return -1;
+    }
+    return 0;
 }
 
-int binarySearch(data_t data[], int size, long long timeSet){
+int binarySearch(data_t *data, int *size,  time_t *timeSet){
+    if (*size <= 0) {
+        return -1;
+    }
     int start = 0;
-    int end = size - 1;
+    int end = *size - 1;
     int mid;
     int near = 0;
 
     while(start <= end){
         mid = (start + end) / 2;
-        if (abs(data[mid].tmstamp - timeSet) < abs(data[near].tmstamp - timeSet)) {
+        if (llabs(data[mid].tmstamp - *timeSet) < llabs(data[near].tmstamp - *timeSet)) {
             near = mid;
         }
-        if(timeSet == data[mid].tmstamp){
+        if(*timeSet == data[mid].tmstamp){
             return mid;
-        }else if(timeSet > data[mid].tmstamp){
+        }else if(*timeSet > data[mid].tmstamp){
             start = mid + 1;
         }else{
             end = mid - 1;
@@ -97,7 +87,7 @@ int binarySearch(data_t data[], int size, long long timeSet){
 }
 
 int countID(int *count, char *data_id[], int size, char *getType[]){
-    if(count == NULL || data_id == NULL || getType == NULL){return -1;}
+    if(count == NULL || getType == NULL){return -1;}
     
     FILE *file;
     char buffer[LINE];
@@ -110,6 +100,7 @@ int countID(int *count, char *data_id[], int size, char *getType[]){
     while(fgets(buffer, LINE, file)){
         char *parser = strtok(buffer, " ");
         if(parser == NULL) continue;
+
         parser = strtok(NULL, " "); 
         if(parser == NULL) continue;
         char *copy = strdup(parser);
@@ -118,6 +109,7 @@ int countID(int *count, char *data_id[], int size, char *getType[]){
             free(id);
             return -1;
         }
+
         parser = strtok(NULL, " ");
         char *copy2 = strdup(parser);
         if(copy2 == NULL){
@@ -125,6 +117,7 @@ int countID(int *count, char *data_id[], int size, char *getType[]){
             free(id);
             return -1;
         }
+
         if(id == NULL || strcmp(copy, id) != 0){
             if(*count < size){
                 data_id[*count] = copy;

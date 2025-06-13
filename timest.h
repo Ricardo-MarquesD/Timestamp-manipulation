@@ -22,11 +22,11 @@ typedef struct data_t{
 }data_t;
 
 void buffree(); // Pronto
-bool atob(const char *_Str); // Em teste
-void orderData(data_t data[], int *quantity); // Em teste
-void inputVerify(time_t *timestamp, char *input, char **id);
-int binarySearch(data_t data[], int size, long long timeSet);
-int countID(int *count, char *data_id[], int size, char *getType[]);
+bool atob(const char *_Str); // Pronta
+void orderData(data_t data[], int *quantity); // Pronta
+int inputVerify(data_t *_generic, const char *charTime, const char *inputID); // Em testes
+int binarySearch(data_t *data, int *size, time_t *timeSet); // Em testes
+int countID(int *count, char *data_id[], int size, char *getType[]); // Pronta
 time_t getTime(const char *charTime); // Pronto
 time_t generateTimestamp(time_t *start_timestamp, time_t *final_timestamp); // Pronto
 int randomInt(); // Pronto

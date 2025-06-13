@@ -4,90 +4,80 @@
 #include <string.h>
 #include "timest.h"
 
-void inputVerify(time_t *timestamp, char *input, char **id){
-    int flag = 0;
-    struct tm data;
-
-    while (1){
-        printf("Digite uma data (DD MM AAAA HH MM SS): ");
-        if(scanf("%d %d %d %d %d %d", &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
-            buffree();
-            printf("Entrada de data invalida.\n");
-            continue;
-        }
-        buffree();
-        printf("Digite o id do sensor desejado: ");
-        if(fgets(input,sizeof(input), stdin) == NULL){
-            printf("Entrada de id invalido.\n");
-            continue;
-        }
-        input[strcspn(input, "\n")] = 0;
-
-        data.tm_mon = data.tm_mon - 1;
-        data.tm_year = data.tm_year - 1900;
-        data.tm_isdst = -1;
-        *timestamp = mktime(&data);
-
-        for(int i = 0; i < ID_S-1; i++){
-            if(strcmp(input, id[i]) == 0){
-                flag = 1;
-                break;
-            }
-        }
-
-        if(flag == 0) {
-            printf("ID invalido.\n");
-        } else if (*timestamp == -1) {
-            printf("Timestamp invalido.\n");
-        } else {
-            return;
-        }
-    }
-}
-
 int main(int argc, char const *argv[]){
+    if(argc != 3){
+        printf("Entrata invalidas, muito argumento");
+        return -1;
+    }
     FILE* file;
-    time_t t;
+    data_t generic = {0};
+    data_t data[DATA_SIZE] = {0};
     int index = 0;
-    long timestampFile[ITENS];
-    float valor[ITENS];
-    char *id[ITENS];
-    char *idTypes[ID_S-1] = {"TEMP", "PRES", "UMID", "VIBR"};
-    char input[10], text[LINE];
+    char *type = {0};
+    char text[LINE];
+    char filename[20];
 
-    inputVerify(&t, input, idTypes);
+    inputVerify(&generic, argv[1], argv[2]);
+    strncpy(filename, generic.ID, sizeof(filename));
+    strncat(filename, ".txt", sizeof(filename)-strlen(filename)-1);
 
-    strncat(input, ".txt", sizeof(input) - strlen(input) - 1);
 
-    file = fopen(input, "r");
+    file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Erro ao abrir o arquivo %s\n", input);
+        printf("Erro ao abrir o arquivo %s\n", filename);
         return 1;
     }
 
-        while(fgets(text, LINE, file) != NULL){
-            char* parser = strtok(text, " ");
-            timestampFile[index] = atol(parser);
+    fgets(text, LINE, file);
+    while(fgets(text, LINE, file) != NULL){
+        char* parser = strtok(text, " ");
+        if(parser == NULL){return -1;}
+        data[index].tmstamp = atoll(parser);
 
-            parser = strtok(NULL, " ");
-            id[index] = strdup(parser);
+        parser = strtok(NULL, " ");
+        strncpy(data[index].ID, parser, sizeof(data[index].ID));
 
-            parser = strtok(NULL, "\r\n");
-            valor[index] = atof(parser);
+        parser = strtok(NULL, " ");
+        type = strdup(parser);
+        if(type == NULL){return -1;}
 
-            //printf("Timestamp: %ld, ID: %s, Valor: %.2f\n", timestampFile[index], id[index], valor[index]);
-
-            index++;
+        parser = strtok(NULL, "\r\n");
+        if (strcmp(type, "bool:") == 0) {
+            data[index].valor_u.boolType = atob(parser);
+        } else if (strcmp(type, "str:") == 0) {
+            strcpy(data[index].valor_u.stringType, parser);
+        } else if (strcmp(type, "double:") == 0) {
+            data[index].valor_u.doubleType = atof(parser);
+        } else if (strcmp(type, "int:") == 0) {
+            data[index].valor_u.intType = atoi(parser);
+        } else {
+            printf("Tipo inválido!\n");
+            free(type);
+            return -1;
         }
+        index++;
+    }
     fclose(file);
-
-    int indexBS = binarySearch(timestampFile, index, t);
-
-    if(indexBS >= 0 && indexBS < index){
-        printf("O registro mais perto do pedido encontrado e de: TIMESTAMP: %lld | ID: %s | VALOR: %.2f", timestampFile[indexBS], id[indexBS], valor[indexBS]);
-    }else{
+    
+    int indexBS = binarySearch(data, &index, &generic.tmstamp);
+    if(indexBS < 0 || indexBS >= index){
         printf("Nao foi encontrado nenhum registro");
+        return -1;
+    }
+    printf("O registro mais perto do pedido encontrado eh de: TIMESTAMP: %lld || ID: %s || ", data[indexBS].tmstamp, data[indexBS].ID);
+    if(strcmp(type, "bool:") == 0){
+        printf("VALOR: %s", data[indexBS].valor_u.boolType);
+    }else if(strcmp(type, "str:") == 0){
+        printf("VALOR: %s", data[indexBS].valor_u.stringType);
+    }else if(strcmp(type, "double:") == 0){
+        printf("VALOR: %.2lf", data[indexBS].valor_u.doubleType);
+    }else if(strcmp(type, "int:") == 0){
+        printf("VALOR: %d", data[indexBS].valor_u.intType);
+    }else{
+        printf("Tipo inválido!\n");
+        return -1;
     }
     
+    free(type);
     return 0;
 }
