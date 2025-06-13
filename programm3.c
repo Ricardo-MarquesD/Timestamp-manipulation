@@ -28,13 +28,13 @@ int main(int argc, char const *argv[]){
             time_t tmstamp = generateTimestamp(&start_timestamp, &final_timestamp);
 
             if(!strcmp(argv[index+i], "bool")){
-                fprintf(file, "%ld %s %s\n", tmstamp, argv[3+i], randomBool() ? "true" : "false");
+                fprintf(file, "%ld %s bool: %s\n", tmstamp, argv[3+i], randomBool() ? "true" : "false");
             }else if(!strcmp(argv[index+i], "String")){
-                fprintf(file, "%ld %s %s\n", tmstamp, argv[3+i], randomString());
+                fprintf(file, "%ld %s str: %s\n", tmstamp, argv[3+i], randomString());
             }else if(!strcmp(argv[index+i], "double")){
-                fprintf(file, "%ld %s %.2lf\n", tmstamp, argv[3+i], randomDouble());
+                fprintf(file, "%ld %s double: %.2lf\n", tmstamp, argv[3+i], randomDouble());
             }else if(!strcmp(argv[index+i], "int")){
-                fprintf(file, "%ld %s %d\n", tmstamp, argv[3+i], randomInt());
+                fprintf(file, "%ld %s int: %d\n", tmstamp, argv[3+i], randomInt());
             }else {printf("Tipo de sensor invalido!\n"); return -1;}
         }
     }

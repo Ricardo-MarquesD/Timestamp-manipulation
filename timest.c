@@ -9,13 +9,20 @@ void buffree(){
     while(getchar() != '\n');
 }
 
-void orderData(data_t *data[], int size){
+bool atob(const char *_Str){
+    if(_Str == NULL){
+        printf("Valor de str_file invalido.\n");
+    }
+    return strcmp(_Str, "true") == 0 ? 1 : 0;
+}
+
+void orderData(data_t data[], int *quantity){
     int flag = 1;
     while(flag) {
         flag = 0;
-        for (int i = 0; i < size - 1; i++) {
-            if (data[i]->tmstamp > data[i+1]->tmstamp) {
-                data_t *temp = data[i];
+        for (int i = 0; i < *quantity - 1; i++) {
+            if (data[i].tmstamp > data[i+1].tmstamp) {
+                data_t temp = data[i];
                 data[i] = data[i+1];
                 data[i+1] = temp;
 
@@ -89,6 +96,58 @@ int binarySearch(data_t data[], int size, long long timeSet){
     return near;
 }
 
+int countID(int *count, char *data_id[], int size, char *getType[]){
+    if(count == NULL || data_id == NULL || getType == NULL){return -1;}
+    
+    FILE *file;
+    char buffer[LINE];
+    char *id = NULL;
+    *count = 0;
+
+    file = fopen("test.txt", "r");
+    if(file == NULL){return -1;}
+    fgets(buffer, LINE, file);
+    while(fgets(buffer, LINE, file)){
+        char *parser = strtok(buffer, " ");
+        if(parser == NULL) continue;
+        parser = strtok(NULL, " "); 
+        if(parser == NULL) continue;
+        char *copy = strdup(parser);
+        if(copy == NULL){
+            fclose(file);
+            free(id);
+            return -1;
+        }
+        parser = strtok(NULL, " ");
+        char *copy2 = strdup(parser);
+        if(copy2 == NULL){
+            fclose(file);
+            free(id);
+            return -1;
+        }
+        if(id == NULL || strcmp(copy, id) != 0){
+            if(*count < size){
+                data_id[*count] = copy;
+                getType[*count] = copy2;
+                (*count)++;
+                free(id);
+                id = strdup(copy);
+            } else {
+                free(copy);
+                free(copy2);
+                break;
+            }
+        } else {
+            free(copy);
+            free(copy2);
+        }
+    }
+    fclose(file);
+    free(id);
+    return 0;
+}
+
+
 time_t getTime(const char *charTime){
     struct tm data;
     if(sscanf(charTime, "%d/%d/%d %d:%d:%d", &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
@@ -115,7 +174,7 @@ int randomInt(){
 }
 
 bool randomBool(){
-    return (bool)rand()%2;
+    return rand()%2;
 }
 
 double randomDouble(){
