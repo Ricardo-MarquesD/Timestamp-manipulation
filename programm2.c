@@ -21,7 +21,6 @@ void inputVerify(time_t* timestamp, char* input, char** id, int index){
             printf("Entrada de data invalida.\n");
             continue;
         }
-
         buffree();
 
         printf("Digite o id do sensor desejado: ");
