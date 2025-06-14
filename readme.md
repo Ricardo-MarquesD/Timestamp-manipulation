@@ -61,7 +61,7 @@ O projeto é composto pelos seguintes arquivos:
 ## Programm 02
 
 - Compilação: ```gcc programm2.c timest.c -o play1```
-- Execução: ```.\play1.exe <data> <nome_sensor>```
+- Execução: ```.\play2.exe <data> <nome_sensor>```
 - Formatação das datas: ```"DD/MM/YYYY HH/MM/SS"```;
 - Exemplo: ```.\play2.exe "14/06/2025 16:01:00" sensor2```
 
@@ -75,7 +75,7 @@ O projeto é composto pelos seguintes arquivos:
 ## Programm 03
 
 - Compilação: ```gcc programm3.c timest.c -o play1```
-- Execução: ```.\play1.exe <data_inicial> <data_final> <nome_sensor> <tipo_de_dado>```
+- Execução: ```.\play3.exe <data_inicial> <data_final> <nome_sensor> <tipo_de_dado>```
 - Formatação das datas: ```"DD/MM/YYYY HH/MM/SS"```;
 - Exemplo: ```.\play3.exe "13/06/2025 15:58:12" "15/06/2025 15:58:12" sensor1 sensor2 bool String```
 
