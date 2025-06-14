@@ -32,7 +32,7 @@ void orderData(data_t data[], int *quantity){
     }
 }
 
-int inputVerify(data_t *_generic, const char *charTime, const char *inputID){
+int inputVerify(data_t *_generic, const char *inputID, const char *charTime){
     if(charTime == NULL || inputID == NULL){
         printf("Parametro NULL informado.\n");
         return -1;

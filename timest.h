@@ -21,17 +21,17 @@ typedef struct data_t{
     }valor_u;
 }data_t;
 
-void buffree(); // Pronto
-bool atob(const char *_Str); // Pronta
-void orderData(data_t data[], int *quantity); // Pronta
-int inputVerify(data_t *_generic, const char *charTime, const char *inputID); // Em testes
-int binarySearch(data_t *data, int *size, time_t *timeSet); // Em testes
-int countID(int *count, char *data_id[], int size, char *getType[]); // Pronta
-time_t getTime(const char *charTime); // Pronto
-time_t generateTimestamp(time_t *start_timestamp, time_t *final_timestamp); // Pronto
-int randomInt(); // Pronto
-bool randomBool(); // Pronto
-double randomDouble(); // Pronto
-char *randomString(); // Pronto
+void buffree();
+bool atob(const char *_Str);
+void orderData(data_t data[], int *quantity);
+int inputVerify(data_t *_generic, const char *inputID, const char *charTime);
+int binarySearch(data_t *data, int *size, time_t *timeSet);
+int countID(int *count, char *data_id[], int size, char *getType[]);
+time_t getTime(const char *charTime);
+time_t generateTimestamp(time_t *start_timestamp, time_t *final_timestamp);
+int randomInt();
+bool randomBool();
+double randomDouble();
+char *randomString();
 
 #endif
