@@ -13,20 +13,15 @@
 typedef struct data_t{
     time_t tmstamp;
     char ID[ID_S];
-    union valor{
-        int intType;
-        bool boolType;
-        double doubleType;
-        char stringType[CHAR_S];
-    }valor_u;
+    char valor[CHAR_S];
 }data_t;
 
 void buffree();
 bool atob(const char *_Str);
 void orderData(data_t data[], int *quantity);
-int inputVerify(data_t *_generic, const char *inputID, const char *charTime);
+int inputVerify(data_t *_generic, const char *charTime, const char *inputID);
 int binarySearch(data_t *data, int *size, time_t *timeSet);
-int countID(int *count, char *data_id[], int size, char *getType[]);
+int countID(int *count, char *data_id[], int size);
 time_t getTime(const char *charTime);
 time_t generateTimestamp(time_t *start_timestamp, time_t *final_timestamp);
 int randomInt();

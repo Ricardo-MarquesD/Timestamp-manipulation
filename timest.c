@@ -32,7 +32,7 @@ void orderData(data_t data[], int *quantity){
     }
 }
 
-int inputVerify(data_t *_generic, const char *inputID, const char *charTime){
+int inputVerify(data_t *_generic, const char *charTime, const char *inputID){
     if(charTime == NULL || inputID == NULL){
         printf("Parametro NULL informado.\n");
         return -1;
@@ -86,53 +86,54 @@ int binarySearch(data_t *data, int *size,  time_t *timeSet){
     return near;
 }
 
-int countID(int *count, char *data_id[], int size, char *getType[]){
-    if(count == NULL || getType == NULL){return -1;}
+int countID(int *count, char *data_id[], int size){
+    if(count == NULL){return -1;}
     
     FILE *file;
     char buffer[LINE];
     char *id = NULL;
     *count = 0;
+    int nLinha = 1;
 
     file = fopen("test.txt", "r");
     if(file == NULL){return -1;}
     fgets(buffer, LINE, file);
     while(fgets(buffer, LINE, file)){
+        nLinha++;
         char *parser = strtok(buffer, " ");
-        if(parser == NULL) continue;
+        if(parser == NULL) {
+            printf("Linha %d invalida, em text.txt. Portanto, linha pulada.\n", nLinha);
+            continue;
+        }
 
         parser = strtok(NULL, " "); 
-        if(parser == NULL) continue;
+        if(parser == NULL) {
+            printf("Linha %d invalida, em text.txt. Portanto, linha pulada.\n", nLinha);
+            continue;
+        }
         char *copy = strdup(parser);
         if(copy == NULL){
             fclose(file);
             free(id);
             return -1;
         }
-
         parser = strtok(NULL, " ");
-        char *copy2 = strdup(parser);
-        if(copy2 == NULL){
-            fclose(file);
-            free(id);
-            return -1;
+        if(parser == NULL) {
+            printf("Linha %d invalida, em text.txt. Portanto, linha pulada.\n", nLinha);
+            continue;
         }
-
         if(id == NULL || strcmp(copy, id) != 0){
             if(*count < size){
                 data_id[*count] = copy;
-                getType[*count] = copy2;
                 (*count)++;
                 free(id);
                 id = strdup(copy);
             } else {
                 free(copy);
-                free(copy2);
                 break;
             }
         } else {
             free(copy);
-            free(copy2);
         }
     }
     fclose(file);
@@ -143,12 +144,27 @@ int countID(int *count, char *data_id[], int size, char *getType[]){
 
 time_t getTime(const char *charTime){
     struct tm data;
-    if(sscanf(charTime, "%d/%d/%d %d:%d:%d", &data.tm_mday, &data.tm_mon, &data.tm_year, &data.tm_hour, &data.tm_min, &data.tm_sec) != 6){
+    int mday, mon, year, hour, min, sec;
+    if(sscanf(charTime, "%d/%d/%d %d:%d:%d", &mday, &mon, &year, &hour, &min, &sec) != 6){
         printf("Falha de transformação.\n");
+        return -1;
     }
-    data.tm_mon = data.tm_mon - 1;
-    data.tm_year = data.tm_year - 1900;
+    if(mday > 31 || mon > 12 || hour > 24 || min > 60 || sec > 60){
+        printf("Argumento(s) de data invalida: Valores de data, muito acima do esperado\n");
+        return -1;
+    }else if(mday < 1 || mon < 1 || hour < 0 || min < 0 || sec < 0){
+        printf("Argumento(s) de data invalida: Valores de data, muito abaixo do esperado\n");
+        return -1;
+    }
+
+    data.tm_mday = mday;
+    data.tm_mon = mon - 1;
+    data.tm_year = year - 1900;
+    data.tm_hour = hour;
+    data.tm_min = min;
+    data.tm_sec = sec;
     data.tm_isdst = -1;
+
     time_t timestamp = mktime(&data);
     if(timestamp == -1){
         printf("Valor do timestamp invalido.\n");

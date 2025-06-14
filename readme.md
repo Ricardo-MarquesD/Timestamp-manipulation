@@ -19,12 +19,7 @@ O projeto é composto pelos seguintes arquivos:
     typedef struct data_t{
     time_t tmstamp;
     char ID[ID_S];
-    union valor{
-        int intType;
-        bool boolType;
-        double doubleType;
-        char stringType[CHAR_S];
-    }valor_u;
+    char valro[CHAR_S]
     }data_t;
 ```
 
@@ -35,13 +30,13 @@ O projeto é composto pelos seguintes arquivos:
 - Estrutura dos arquivos em .txt:
 ```
     TIMESTAMP ID VALOR(cabeçalho)
-    <timestamp> <ID> <tipo>: <valor>(como está escrito)
+    <timestamp> <ID> <valor>(como está escrito)
 ```
 
 - Exemplo:
 ```
     TIMESTAMP ID VALOR
-    1749852106 sensor1 bool: true
+    1749852106 sensor1 true
 ```
 
 ---
