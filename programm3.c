@@ -13,7 +13,7 @@ int main(int argc, char const *argv[]){
     srand(time(NULL));
     FILE *file;
     int size = (argc - 3)/2;
-    if(size%2){
+    if(!size%2){
         printf("Error: argumentos invalidos.\n");
     }
     time_t start_timestamp = getTime(argv[1]);
